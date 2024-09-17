@@ -11,6 +11,7 @@ import {
   Snackbar,
   Box,
   IconButton,
+  Alert,
 } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
@@ -25,12 +26,14 @@ const loginValidationSchema = Yup.object().shape({
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const login = useContext(AuthContext);
   const navigate = useNavigate();
-
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -39,13 +42,19 @@ const Login = () => {
         password,
       });
       login(response.data.token);
-      setSnackbarOpen(true);
-      setSnackbarMessage("Login Successful!");
+      setSnackbar({
+        open: true,
+        message: "Login successfully",
+        severity: "success",
+      });
       navigate("/read");
     } catch (error) {
       console.error("Login failed", error);
-      setSnackbarOpen(true);
-      setSnackbarMessage("Login failed, Please verify your credentials!");
+      setSnackbar({
+        open: true,
+        message: "Login failed, Please verify your credentials!",
+        severity: "error",
+      });
     }
   };
   const redirectToRegister = () => {
@@ -114,11 +123,14 @@ const Login = () => {
             Create an account/Sign up
           </Button>
           <Snackbar
-            open={snackbarOpen}
+            open={snackbar.open}
             autoHideDuration={3000}
-            onClose={() => setSnackbarOpen(false)}
-            message={snackbarMessage}
-          />
+            onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+          >
+            <Alert severity={snackbar.severity} sx={{ width: "100%" }}>
+              {snackbar.message}
+            </Alert>
+          </Snackbar>
         </form>
       </Box>
     </Container>

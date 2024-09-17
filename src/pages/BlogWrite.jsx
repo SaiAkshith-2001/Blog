@@ -15,6 +15,7 @@ import {
   IconButton,
   Snackbar,
   CircularProgress,
+  Alert,
 } from "@mui/material";
 import { styled } from "@mui/system";
 import EditIcon from "@mui/icons-material/Edit";
@@ -68,8 +69,12 @@ const BlogWrite = () => {
     title: "",
     content: "",
   });
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
+
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
   const getNews = async () => {
     // Simulating API call to fetch posts
     setIsLoading(true);
@@ -106,19 +111,29 @@ const BlogWrite = () => {
       setPosts(
         posts.map((post) => (post.id === currentPost.id ? currentPost : post))
       );
-      setSnackbarMessage("Post updated successfully!");
+      setSnackbar({
+        open: true,
+        message: "Post updated successfully",
+        severity: "success",
+      });
     } else {
       setPosts([...posts, { ...currentPost, id: Date.now().toString() }]);
-      setSnackbarMessage("New post created successfully!");
+      setSnackbar({
+        open: true,
+        message: "Post created successfully",
+        severity: "success",
+      });
     }
-    setSnackbarOpen(true);
     handleDialogClose();
   };
 
   const handlePostDelete = (id) => {
     setPosts(posts.filter((post) => post.id !== id));
-    setSnackbarMessage("Post deleted successfully!");
-    setSnackbarOpen(true);
+    setSnackbar({
+      open: true,
+      message: "Post deleted successfully",
+      severity: "success",
+    });
   };
 
   const handlePostEdit = async () => {
@@ -223,11 +238,14 @@ const BlogWrite = () => {
         </DialogActions>
       </Dialog>
       <Snackbar
-        open={snackbarOpen}
+        open={snackbar.open}
         autoHideDuration={3000}
-        onClose={() => setSnackbarOpen(false)}
-        message={snackbarMessage}
-      />
+        onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+      >
+        <Alert severity={snackbar.severity} sx={{ width: "100%" }}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </>
   );
 };

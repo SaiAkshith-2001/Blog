@@ -7,6 +7,7 @@ import {
   Typography,
   Snackbar,
   IconButton,
+  Alert,
 } from "@mui/material";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
@@ -32,8 +33,11 @@ const RegistrationForm = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
   const [showPassword, setShowPassword] = useState(false);
 
   const navigate = useNavigate();
@@ -52,12 +56,18 @@ const RegistrationForm = () => {
         password,
       });
       // login(response.data.token);
-      setSnackbarOpen(true);
-      setSnackbarMessage("User registered Successfully!");
+      setSnackbar({
+        open: true,
+        message: "User registered Successfully!",
+        severity: "success",
+      });
     } catch (error) {
       console.error("Login failed", error);
-      setSnackbarOpen(true);
-      setSnackbarMessage("Login failed, Please verify your credentials!");
+      setSnackbar({
+        open: true,
+        message: "Invalid user, Please verify your credentials!",
+        severity: "error",
+      });
     }
   };
   return (
@@ -149,11 +159,14 @@ const RegistrationForm = () => {
             </Button>
           </Typography>
           <Snackbar
-            open={snackbarOpen}
+            open={snackbar.open}
             autoHideDuration={3000}
-            onClose={() => setSnackbarOpen(false)}
-            message={snackbarMessage}
-          />
+            onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+          >
+            <Alert severity={snackbar.severity} sx={{ width: "100%" }}>
+              {snackbar.message}
+            </Alert>
+          </Snackbar>
         </Box>
       </Box>
     </Container>
