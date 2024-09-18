@@ -26,6 +26,7 @@ import { AuthProvider } from "./context/AuthContext";
 import MarkdownEditor from "./Component/MarkdownEditor";
 import RegistrationForm from "./pages/RegistrationForm";
 import PersonIcon from "@mui/icons-material/Person";
+import NoteEditor from "./pages/Editor";
 function App(props) {
   const { window } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
@@ -178,6 +179,7 @@ function App(props) {
           <Route path="/register" element={<RegistrationForm />} />
           <Route path="/posts/:id/" element={<BlogPost />} />
           <Route path="/posts/:id/comments" element={<PostComment />} />
+          <Route path="/quileditor" element={<NoteEditor />} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>

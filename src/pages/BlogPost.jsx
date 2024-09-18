@@ -13,8 +13,6 @@ import {
   CardActions,
 } from "@mui/material";
 import { useParams } from "react-router-dom";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
 
 const BlogPostStyled = styled(Card)(({ theme }) => ({
   width: "100%",
@@ -91,9 +89,9 @@ const BlogPost = () => {
                 </Typography>
               </CardContent>
               <CardActions>
-                <IconButton aria-label="edit" onClick={handleEditPost}>
-                  <EditIcon />
-                </IconButton>
+                {/* <IconButton aria-label="edit" onClick={handleEditPost}>
+                  <EditIcon /> 
+                </IconButton> */}
               </CardActions>
             </BlogPostStyled>
             <PostComment />

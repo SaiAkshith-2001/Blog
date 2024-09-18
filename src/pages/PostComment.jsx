@@ -6,17 +6,10 @@ import {
   Card,
   CardContent,
   Typography,
-  Fab,
   CircularProgress,
   Stack,
 } from "@mui/material";
 import { useParams } from "react-router-dom";
-
-const StyledFab = styled(Fab)(({ theme }) => ({
-  position: "fixed",
-  bottom: theme.spacing(2),
-  right: theme.spacing(2),
-}));
 
 const BlogPost = styled(Card)(({ theme }) => ({
   width: "100%",

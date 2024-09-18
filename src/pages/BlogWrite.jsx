@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import {
   Typography,
   Container,
@@ -58,7 +59,7 @@ const BlogPost = ({ post, onEdit, onDelete }) => (
 const BlogWrite = () => {
   const [id, setId] = React.useState("");
   const [title, setTitle] = React.useState("");
-  const [content, setContent] = React.useState("");
+  const [body, setBody] = React.useState("");
   const [newsData, setNewsData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(1);
@@ -67,7 +68,7 @@ const BlogWrite = () => {
   const [currentPost, setCurrentPost] = useState({
     id: "",
     title: "",
-    content: "",
+    body: "",
   });
 
   const [snackbar, setSnackbar] = useState({
@@ -103,11 +104,18 @@ const BlogWrite = () => {
 
   const handleDialogClose = () => {
     setDialogOpen(false);
-    setCurrentPost({ id: "", title: "", content: "" });
+    setCurrentPost({ id: "", title: "", body: "" });
   };
 
   const handlePostSave = () => {
-    if (currentPost.id) {
+    if (!currentPost.title || !currentPost.body) {
+      setSnackbar({
+        open: true,
+        message: "Please fill all fields",
+        severity: "error",
+      });
+      return;
+    } else if (currentPost.id) {
       setPosts(
         posts.map((post) => (post.id === currentPost.id ? currentPost : post))
       );
@@ -128,12 +136,14 @@ const BlogWrite = () => {
   };
 
   const handlePostDelete = (id) => {
-    setPosts(posts.filter((post) => post.id !== id));
-    setSnackbar({
-      open: true,
-      message: "Post deleted successfully",
-      severity: "success",
-    });
+    if (window.confirm("Are you sure you want to delete this post?")) {
+      setPosts(posts.filter((post) => post.id !== id));
+      setSnackbar({
+        open: true,
+        message: "Post deleted successfully",
+        severity: "success",
+      });
+    }
   };
 
   const handlePostEdit = async () => {
@@ -149,7 +159,7 @@ const BlogWrite = () => {
           body: JSON.stringify({
             id,
             title,
-            content,
+            body,
           }),
         }
       );
@@ -159,7 +169,7 @@ const BlogWrite = () => {
         throw new Error("please try again!");
       } else {
         setIsLoading(false);
-        setCurrentPost({ id: data.id, title: data.title, content: data.body });
+        setCurrentPost({ id: data.id, title: data.title, body: data.body });
         setDialogOpen(true);
       }
     } catch (err) {
@@ -170,6 +180,7 @@ const BlogWrite = () => {
   useEffect(() => {
     handlePostEdit();
   }, []);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setCurrentPost({ ...currentPost, [name]: value });
@@ -221,14 +232,14 @@ const BlogWrite = () => {
           />
           <TextField
             margin="dense"
-            name="content"
+            name="body"
             label="Content"
             type="text"
             fullWidth
             variant="standard"
             multiline
             rows={4}
-            value={currentPost.content}
+            value={currentPost.body}
             onChange={handleInputChange}
           />
         </DialogContent>
@@ -237,6 +248,7 @@ const BlogWrite = () => {
           <Button onClick={handlePostSave}>Save</Button>
         </DialogActions>
       </Dialog>
+
       <Snackbar
         open={snackbar.open}
         autoHideDuration={3000}
