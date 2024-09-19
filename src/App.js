@@ -1,32 +1,41 @@
-import React from "react";
-import AppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
-import CssBaseline from "@mui/material/CssBaseline";
-import Divider from "@mui/material/Divider";
-import Drawer from "@mui/material/Drawer";
-import IconButton from "@mui/material/IconButton";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemText from "@mui/material/ListItemText";
-import MenuIcon from "@mui/icons-material/Menu";
-import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
+import React, { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import {
+  AppBar,
+  Box,
+  Button,
+  CssBaseline,
+  CircularProgress,
+  Divider,
+  Drawer,
+  IconButton,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  Toolbar,
+  Typography,
+} from "@mui/material";
+// import MenuIcon from "@mui/icons-material/Menu";
+// import PersonIcon from "@mui/icons-material/Person";
+// import BlogWrite from "./pages/BlogWrite";
+// import BlogRead from "./pages/BlogRead";
+// import BlogPost from "./pages/BlogPost";
 import Home from "./pages/Home";
-import BlogWrite from "./pages/BlogWrite";
-import BlogRead from "./pages/BlogRead";
-import BlogPost from "./pages/BlogPost";
 import PostComment from "./pages/PostComment";
 import About from "./pages/About";
 import Login from "./pages/Login";
-import ThemeToggleButton from "./Component/ToggleButton";
-import { AuthProvider } from "./context/AuthContext";
-import MarkdownEditor from "./Component/MarkdownEditor";
 import RegistrationForm from "./pages/RegistrationForm";
-import PersonIcon from "@mui/icons-material/Person";
 import NoteEditor from "./pages/Editor";
+import { AuthProvider } from "./context/AuthContext";
+import NotFound from "./pages/NotFound";
+const BlogRead = lazy(() => import("./pages/BlogRead"));
+const BlogPost = lazy(() => import("./pages/BlogPost"));
+const BlogWrite = lazy(() => import("./pages/BlogWrite"));
+const ThemeToggleButton = lazy(() => import("./Component/ToggleButton"));
+const MarkdownEditor = lazy(() => import("./Component/MarkdownEditor"));
+const MenuIcon = lazy(() => import("@mui/icons-material/Menu"));
+const PersonIcon = lazy(() => import("@mui/icons-material/Person"));
 function App(props) {
   const { window } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
@@ -141,7 +150,7 @@ function App(props) {
           open={mobileOpen}
           onClose={handleDrawerToggle}
           ModalProps={{
-            keepMounted: true, // Better open performance on mobile.
+            keepMounted: true, // enabled on smaller devices i.e., mobile.
           }}
           sx={{
             display: { xs: "block", sm: "none" },
@@ -155,32 +164,34 @@ function App(props) {
         </Drawer>
       </Box>
       <AuthProvider>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route
-            path="/write"
-            element={
-              // <ProtectedRoute>
-              <BlogWrite />
-              // </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/read"
-            element={
-              // <ProtectedRoute>
-              <BlogRead />
-              // </ProtectedRoute>
-            }
-          />
-          <Route path="/about" element={<About />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/editor" element={<MarkdownEditor />} />
-          <Route path="/register" element={<RegistrationForm />} />
-          <Route path="/posts/:id/" element={<BlogPost />} />
-          <Route path="/posts/:id/comments" element={<PostComment />} />
-          <Route path="/quileditor" element={<NoteEditor />} />
-        </Routes>
+        <Suspense
+          fallback={
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                position: "relative",
+              }}
+            >
+              <CircularProgress />
+            </Box>
+          }
+        >
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/write" element={<BlogWrite />} />
+            <Route path="/read" element={<BlogRead />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/editor" element={<MarkdownEditor />} />
+            <Route path="/register" element={<RegistrationForm />} />
+            <Route path="/posts/:id/" element={<BlogPost />} />
+            <Route path="/posts/:id/comments" element={<PostComment />} />
+            <Route path="/quilleditor" element={<NoteEditor />} />
+            <Route path="/*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
       </AuthProvider>
     </BrowserRouter>
   );

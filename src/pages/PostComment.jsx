@@ -8,6 +8,7 @@ import {
   Typography,
   CircularProgress,
   Stack,
+  Box,
 } from "@mui/material";
 import { useParams } from "react-router-dom";
 
@@ -69,7 +70,9 @@ const BlogRead = () => {
   return (
     <Container maxWidth="md" style={{ marginTop: "6rem" }}>
       {isLoading ? (
-        <CircularProgress sx={{ top: 50, left: 50, posititon: "relative" }} />
+        <Box sx={{ display: "flex", justifyContent: "center" }}>
+          <CircularProgress />
+        </Box>
       ) : (
         <Grid item xs={12} sm={6} md={4}>
           {postDetails &&

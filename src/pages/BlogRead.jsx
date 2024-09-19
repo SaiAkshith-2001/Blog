@@ -11,6 +11,9 @@ import {
   CircularProgress,
   CardActions,
   Button,
+  Box,
+  IconButton,
+  CardMedia,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
@@ -40,6 +43,7 @@ const BlogRead = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+
   const getNews = async () => {
     if (!hasMore) return;
     // Simulating API call to fetch posts
@@ -96,9 +100,6 @@ const BlogRead = () => {
     post.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleAddPost = () => {
-    console.log("add post");
-  };
   return (
     <Container sx={{ marginTop: "6rem" }}>
       <TextField
@@ -117,6 +118,12 @@ const BlogRead = () => {
             filteredPosts?.map((item, id) => (
               <Grid item xs={12} sm={6} md={4} key={item.id}>
                 <BlogPost>
+                  <CardMedia
+                    component="img"
+                    height="200"
+                    image={`https://images.unsplash.com/photo-1516414447565-b14be0adf13e`}
+                    alt={item.title}
+                  />
                   <StyledCardContent>
                     <Typography variant="h5" component="h2" gutterBottom>
                       {item.title}
@@ -139,11 +146,15 @@ const BlogRead = () => {
             ))}
         </Grid>
         {isLoading && (
-          <CircularProgress sx={{ left: "50%", position: "relative" }} />
+          <Box sx={{ display: "flex", justifyContent: "center" }}>
+            <CircularProgress />
+          </Box>
         )}
       </Container>
       <StyledFab color="primary" aria-label="add">
-        <AddIcon onClick={handleAddPost} />
+        <IconButton color="inherit" component={Link} to="/write">
+          <AddIcon />
+        </IconButton>
       </StyledFab>
     </Container>
   );

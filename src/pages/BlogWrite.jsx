@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useState, useEffect, lazy } from "react";
 import {
   Typography,
   Container,
@@ -17,12 +16,16 @@ import {
   Snackbar,
   CircularProgress,
   Alert,
+  Box,
+  Paper,
+  CardMedia,
 } from "@mui/material";
 import { styled } from "@mui/system";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-
-const StyledCard = styled(Card)(({ theme }) => ({
+import "react-quill/dist/quill.snow.css";
+const ReactQuill = lazy(() => import("react-quill"));
+const DeleteIcon = lazy(() => import("@mui/icons-material/Delete"));
+const EditIcon = lazy(() => import("@mui/icons-material/Edit"));
+const StyledCard = styled(Card)(() => ({
   height: "100%",
   display: "flex",
   flexDirection: "column",
@@ -37,16 +40,32 @@ const StyledCardContent = styled(CardContent)({
 });
 const BlogPost = ({ post, onEdit, onDelete }) => (
   <StyledCard>
+    <CardMedia
+      component="img"
+      height="200"
+      image={`https://images.unsplash.com/photo-1516414447565-b14be0adf13e`}
+      alt={post.title}
+    />
     <StyledCardContent>
       <Typography gutterBottom variant="h5" component="div">
         {post.title}
       </Typography>
+      <Typography color="textSecondary" gutterBottom>
+        {!post.author ? "" : `By ${post.author}`}
+      </Typography>
       <Typography variant="body2" color="text.secondary">
-        {post.body}
+        {post.body.replace(/<\/?[^>]+(>|$)/g, "")}
+      </Typography>
+      <Typography
+        variant="caption"
+        color="text.secondary"
+        sx={{ mt: 1, display: "block" }}
+      >
+        {!post.id ? "" : new Date(post?.id).toLocaleDateString()}
       </Typography>
     </StyledCardContent>
     <CardActions>
-      <IconButton aria-label="edit" onClick={() => onEdit()}>
+      <IconButton aria-label="edit" onClick={() => onEdit(post)}>
         <EditIcon />
       </IconButton>
       <IconButton aria-label="delete" onClick={() => onDelete(post.id)}>
@@ -57,25 +76,23 @@ const BlogPost = ({ post, onEdit, onDelete }) => (
 );
 
 const BlogWrite = () => {
-  const [id, setId] = React.useState("");
-  const [title, setTitle] = React.useState("");
-  const [body, setBody] = React.useState("");
-  const [newsData, setNewsData] = useState([]);
+  const [posts, setPosts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(1);
-  const [posts, setPosts] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [currentPost, setCurrentPost] = useState({
-    id: "",
+  const [editingPost, setEditingPost] = useState(null);
+  const [image, setImage] = useState();
+  const [newPost, setNewPost] = useState({
     title: "",
     body: "",
+    author: "",
   });
-
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
     severity: "success",
   });
+
   const getNews = async () => {
     // Simulating API call to fetch posts
     setIsLoading(true);
@@ -90,7 +107,7 @@ const BlogWrite = () => {
       } else {
         setIsLoading(false);
         setPage((prevPage) => prevPage + 1);
-        setNewsData((prevData) => [...prevData, ...data]);
+        setPosts((prevData) => [...prevData, ...data]);
       }
     } catch (err) {
       setIsLoading(false);
@@ -102,37 +119,48 @@ const BlogWrite = () => {
     getNews();
   }, []);
 
-  const handleDialogClose = () => {
-    setDialogOpen(false);
-    setCurrentPost({ id: "", title: "", body: "" });
-  };
-
-  const handlePostSave = () => {
-    if (!currentPost.title || !currentPost.body) {
+  const handleCreatePost = () => {
+    if (!newPost.title || !newPost.body || !newPost.author) {
       setSnackbar({
         open: true,
         message: "Please fill all fields",
         severity: "error",
       });
       return;
-    } else if (currentPost.id) {
-      setPosts(
-        posts.map((post) => (post.id === currentPost.id ? currentPost : post))
-      );
+    }
+    const post = { ...newPost, id: Date.now() };
+    setPosts((prev) => [post, ...prev]);
+    setNewPost({ title: "", body: "", author: "" });
+    setSnackbar({
+      open: true,
+      message: "Post created successfully",
+      severity: "success",
+    });
+  };
+  const handlePostSave = () => {
+    if (!posts.title || !posts.body) {
+      setSnackbar({
+        open: true,
+        message: "Please fill all fields",
+        severity: "error",
+      });
+      return;
+    } else if (posts.id) {
+      setPosts(posts.map((post) => (post.id === posts.id ? posts : post)));
       setSnackbar({
         open: true,
         message: "Post updated successfully",
         severity: "success",
       });
     } else {
-      setPosts([...posts, { ...currentPost, id: Date.now().toString() }]);
+      setPosts([...posts, { id: Date.now().toString() }]);
       setSnackbar({
         open: true,
         message: "Post created successfully",
         severity: "success",
       });
     }
-    handleDialogClose();
+    setDialogOpen(false);
   };
 
   const handlePostDelete = (id) => {
@@ -145,64 +173,112 @@ const BlogWrite = () => {
       });
     }
   };
-
-  const handlePostEdit = async () => {
-    setIsLoading(true);
-    try {
-      const response = await fetch(
-        "https://jsonplaceholder.typicode.com/posts",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application /json",
-          },
-          body: JSON.stringify({
-            id,
-            title,
-            body,
-          }),
-        }
-      );
-      const data = await response.json();
-      // console.log(data);
-      if (!response.ok) {
-        throw new Error("please try again!");
-      } else {
-        setIsLoading(false);
-        setCurrentPost({ id: data.id, title: data.title, body: data.body });
-        setDialogOpen(true);
-      }
-    } catch (err) {
-      setIsLoading(false);
-      console.error("Error in fetching data, Please try again later!", err);
-    }
+  const handlePostEdit = (post) => {
+    setEditingPost(post);
+    setDialogOpen(true);
   };
-  useEffect(() => {
-    handlePostEdit();
-  }, []);
+
+  const handleUpdatePost = () => {
+    setPosts((prev) =>
+      prev.map((p) => (p.id === editingPost.id ? editingPost : p))
+    );
+    setDialogOpen(false);
+    setSnackbar({
+      open: true,
+      message: "Post updated successfully",
+      severity: "success",
+    });
+  };
+
+  // const handlePostEdit = async () => {
+  //   setIsLoading(true);
+  //   try {
+  //     const response = await fetch(
+  //       "https://jsonplaceholder.typicode.com/posts",
+  //       {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application /json",
+  //         },
+  //         body: JSON.stringify({
+  //           id,
+  //           title,
+  //           body,
+  //         }),
+  //       }
+  //     );
+  //     const data = await response.json();
+  //     // console.log(data);
+  //     if (!response.ok) {
+  //       throw new Error("please try again!");
+  //     } else {
+  //       setIsLoading(false);
+  //       setCurrentPost({ id: data.id, title: data.title, body: data.body });
+  //       setDialogOpen(true);
+  //     }
+  //   } catch (err) {
+  //     setIsLoading(false);
+  //     console.error("Error in fetching data, Please try again later!", err);
+  //   }
+  // };
+  // useEffect(() => {
+  //   handlePostEdit();
+  // }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setCurrentPost({ ...currentPost, [name]: value });
+    setNewPost((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleContentChange = (body) => {
+    setNewPost((prev) => ({ ...prev, body }));
   };
 
   return (
     <>
       <Container sx={{ py: 8, my: 4 }} maxWidth="md">
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => setDialogOpen(true)}
-          sx={{ mb: 4, textTransform: "none" }}
-        >
-          Create New Post
-        </Button>
+        <Paper sx={{ p: 2, mb: 2 }} elevation={3}>
+          <TextField
+            fullWidth
+            label="Title"
+            name="title"
+            value={newPost.title}
+            onChange={handleInputChange}
+            margin="normal"
+          />
+          <TextField
+            fullWidth
+            label="Author"
+            name="author"
+            value={newPost.author}
+            onChange={handleInputChange}
+            margin="normal"
+          />
+          <ReactQuill
+            theme="snow"
+            value={newPost.body}
+            onChange={handleContentChange}
+            placeholder="Write your post content here..."
+          />
+          <Box mt={2}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleCreatePost}
+              // sx={{ mb: 4, textTransform: "none" }}
+            >
+              Create Post
+            </Button>
+          </Box>
+        </Paper>
         {isLoading ? (
-          <CircularProgress sx={{ top: 50, left: 50, posititon: "relative" }} />
+          <Box sx={{ display: "flex", justifyContent: "center" }}>
+            <CircularProgress />
+          </Box>
         ) : (
           <Grid container spacing={4}>
-            {newsData &&
-              newsData.map((post) => (
+            {posts &&
+              posts.map((post) => (
                 <Grid item key={post._id} xs={12} sm={6} md={4}>
                   <BlogPost
                     post={post}
@@ -214,41 +290,38 @@ const BlogWrite = () => {
           </Grid>
         )}
       </Container>
-      <Dialog open={dialogOpen} onClose={handleDialogClose}>
-        <DialogTitle>
-          {currentPost.id ? "Edit Post" : "Create New Post"}
-        </DialogTitle>
+      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
+        <DialogTitle>{posts.id ? "Edit Post" : "Create New Post"}</DialogTitle>
         <DialogContent>
           <TextField
-            autoFocus
-            margin="dense"
-            name="title"
-            label="Title"
-            type="text"
             fullWidth
-            variant="standard"
-            value={currentPost.title}
-            onChange={handleInputChange}
+            label="Title"
+            value={editingPost?.title || ""}
+            onChange={(e) =>
+              setEditingPost((prev) => ({ ...prev, title: e.target.value }))
+            }
+            margin="normal"
           />
           <TextField
-            margin="dense"
-            name="body"
-            label="Content"
-            type="text"
             fullWidth
-            variant="standard"
-            multiline
-            rows={4}
-            value={currentPost.body}
-            onChange={handleInputChange}
+            label="Author"
+            value={editingPost?.author || ""}
+            onChange={(e) =>
+              setEditingPost((prev) => ({ ...prev, author: e.target.value }))
+            }
+            margin="normal"
+          />
+          <ReactQuill
+            theme="snow"
+            value={editingPost?.body || ""}
+            onChange={(body) => setEditingPost((prev) => ({ ...prev, body }))}
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleDialogClose}>Cancel</Button>
-          <Button onClick={handlePostSave}>Save</Button>
+          <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
+          <Button onClick={handleUpdatePost}>Save</Button>
         </DialogActions>
       </Dialog>
-
       <Snackbar
         open={snackbar.open}
         autoHideDuration={3000}
