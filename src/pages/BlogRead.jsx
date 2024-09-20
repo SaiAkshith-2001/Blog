@@ -115,8 +115,8 @@ const BlogRead = () => {
       <Container maxWidth="md" style={{ marginTop: "2rem" }}>
         <Grid container spacing={4}>
           {filteredPosts &&
-            filteredPosts?.map((item, id) => (
-              <Grid item xs={12} sm={6} md={4} key={item.id}>
+            filteredPosts?.map((item) => (
+              <Grid item xs={12} sm={6} md={4} key={item._id}>
                 <BlogPost>
                   <CardMedia
                     component="img"
