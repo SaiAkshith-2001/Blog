@@ -68,7 +68,7 @@ const BlogRead = () => {
   //   }, [isLoading]);
 
   return (
-    <Container maxWidth="md" style={{ marginTop: "6rem" }}>
+    <Container maxWidth="md" style={{ marginTop: "1rem" }}>
       {isLoading ? (
         <Box sx={{ display: "flex", justifyContent: "center" }}>
           <CircularProgress />

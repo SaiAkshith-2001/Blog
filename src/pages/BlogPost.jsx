@@ -97,6 +97,9 @@ const BlogPost = () => {
                 </IconButton> */}
               </CardActions>
             </BlogPostStyled>
+            <Typography variant="body2" color="textSecondary">
+              Comment(s)
+            </Typography>
             <PostComment />
           </Grid>
         </>

@@ -19,6 +19,7 @@ import {
   Box,
   Paper,
   CardMedia,
+  Avatar,
 } from "@mui/material";
 import { styled } from "@mui/system";
 import "react-quill/dist/quill.snow.css";
@@ -50,9 +51,18 @@ const BlogPost = ({ post, onEdit, onDelete }) => (
       <Typography gutterBottom variant="h5" component="div">
         {post.title}
       </Typography>
-      <Typography color="textSecondary" gutterBottom>
-        {!post.author ? "" : `By ${post.author}`}
-      </Typography>
+      {!post.author ? (
+        ""
+      ) : (
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          <Avatar sx={{ width: 24, height: 24, mr: 1 }}>
+            {post.author[0]}
+          </Avatar>
+          <Typography color="textSecondary" gutterBottom>
+            {post.author}
+          </Typography>
+        </Box>
+      )}
       <Typography variant="body2" color="text.secondary">
         {post.body.replace(/<\/?[^>]+(>|$)/g, "")}
       </Typography>
@@ -81,11 +91,13 @@ const BlogWrite = () => {
   const [page, setPage] = useState(1);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingPost, setEditingPost] = useState(null);
-  const [image, setImage] = useState();
+  const [title, setNewTitle] = useState("");
+  const [body, setNewBody] = useState("");
+  const [author, setNewAuthor] = useState("");
   const [newPost, setNewPost] = useState({
     title: "",
-    body: "",
     author: "",
+    body: "",
   });
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -119,6 +131,29 @@ const BlogWrite = () => {
     getNews();
   }, []);
 
+  // const writeNews = async () => {
+  //   setIsLoading(true);
+  //   try {
+  //     const response = await axios.post(
+  //       "https://jsonplaceholder.typicode.com/posts",
+  //       {
+  //         title,
+  //         author,
+  //         body,
+  //       }
+  //     );
+  //     setIsLoading(false);
+  //     const post = { ...newPost, id: Date.now() };
+  //     setPosts((prev) => [post, ...prev]);
+  //     setNewPost({ title: "", body: "", author: "" });
+  //     setNewTitle("");
+  //     setNewAuthor("");
+  //     setNewBody("");
+  //   } catch (err) {
+  //     setIsLoading(false);
+  //     console.error("Error in fetching data, Please try again later!", err);
+  //   }
+  // };
   const handleCreatePost = () => {
     if (!newPost.title || !newPost.body || !newPost.author) {
       setSnackbar({
@@ -137,31 +172,31 @@ const BlogWrite = () => {
       severity: "success",
     });
   };
-  const handlePostSave = () => {
-    if (!posts.title || !posts.body) {
-      setSnackbar({
-        open: true,
-        message: "Please fill all fields",
-        severity: "error",
-      });
-      return;
-    } else if (posts.id) {
-      setPosts(posts.map((post) => (post.id === posts.id ? posts : post)));
-      setSnackbar({
-        open: true,
-        message: "Post updated successfully",
-        severity: "success",
-      });
-    } else {
-      setPosts([...posts, { id: Date.now().toString() }]);
-      setSnackbar({
-        open: true,
-        message: "Post created successfully",
-        severity: "success",
-      });
-    }
-    setDialogOpen(false);
-  };
+  // const handlePostSave = () => {
+  //   if (!posts.title || !posts.body) {
+  //     setSnackbar({
+  //       open: true,
+  //       message: "Please fill all fields",
+  //       severity: "error",
+  //     });
+  //     return;
+  //   } else if (posts.id) {
+  //     setPosts(posts.map((post) => (post.id === posts.id ? posts : post)));
+  //     setSnackbar({
+  //       open: true,
+  //       message: "Post updated successfully",
+  //       severity: "success",
+  //     });
+  //   } else {
+  //     setPosts([...posts, { id: Date.now().toString() }]);
+  //     setSnackbar({
+  //       open: true,
+  //       message: "Post created successfully",
+  //       severity: "success",
+  //     });
+  //   }
+  //   setDialogOpen(false);
+  // };
 
   const handlePostDelete = (id) => {
     if (window.confirm("Are you sure you want to delete this post?")) {
@@ -196,7 +231,7 @@ const BlogWrite = () => {
   //     const response = await fetch(
   //       "https://jsonplaceholder.typicode.com/posts",
   //       {
-  //         method: "POST",
+  //         method: "PUT",
   //         headers: {
   //           "Content-Type": "application /json",
   //         },
@@ -291,7 +326,7 @@ const BlogWrite = () => {
         )}
       </Container>
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
-        <DialogTitle>{posts.id ? "Edit Post" : "Create New Post"}</DialogTitle>
+        <DialogTitle>Edit Post</DialogTitle>
         <DialogContent>
           <TextField
             fullWidth

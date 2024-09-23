@@ -1,4 +1,4 @@
-import React, { lazy, Suspense } from "react";
+import React, { useState, lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import {
   AppBar,
@@ -15,21 +15,10 @@ import {
   ListItemText,
   Toolbar,
   Typography,
+  Menu,
+  MenuItem,
 } from "@mui/material";
-// import MenuIcon from "@mui/icons-material/Menu";
-// import PersonIcon from "@mui/icons-material/Person";
-// import BlogWrite from "./pages/BlogWrite";
-// import BlogRead from "./pages/BlogRead";
-// import BlogPost from "./pages/BlogPost";
-// import Home from "./pages/Home";
-// import PostComment from "./pages/PostComment";
-// import About from "./pages/About";
-// import Login from "./pages/Login";
-// import RegistrationForm from "./pages/RegistrationForm";
-// import NoteEditor from "./pages/Editor";
-// import NotFound from "./pages/NotFound";
 import { AuthProvider } from "./context/AuthContext";
-
 const PostComment = lazy(() => import("./pages/PostComment"));
 const Home = lazy(() => import("./pages/Home"));
 const About = lazy(() => import("./pages/About"));
@@ -47,6 +36,7 @@ const PersonIcon = lazy(() => import("@mui/icons-material/Person"));
 function App(props) {
   const { window } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
   const handleDrawerToggle = () => {
     setMobileOpen((prevState) => !prevState);
   };
@@ -104,7 +94,13 @@ function App(props) {
 
   const container =
     window !== undefined ? () => window().document.body : undefined;
+  const handleMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
 
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
   return (
     <BrowserRouter>
       <Box sx={{ display: "flex" }}>
@@ -146,9 +142,24 @@ function App(props) {
                 About
               </Button>
             </Box>
-            <IconButton color="inherit" component={Link} to="/login">
+            <IconButton color="inherit" onClick={handleMenuOpen}>
+              {/* <IconButton color="inherit" component={Link} to="/login"> */}
               <PersonIcon />
             </IconButton>
+            <Menu
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={handleMenuClose}
+            >
+              <MenuItem component={Link} to="/login">
+                Login
+                {/* if user is Logged in then show user.name else login button */}
+              </MenuItem>
+              <MenuItem component={Link} to="/register">
+                Register
+                {/* if user is registered in then show logout button else register button */}
+              </MenuItem>
+            </Menu>
             <ThemeToggleButton />
           </Toolbar>
         </AppBar>
@@ -192,11 +203,11 @@ function App(props) {
             <Route path="/read" element={<BlogRead />} />
             <Route path="/about" element={<About />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/editor" element={<MarkdownEditor />} />
+            <Route path="/editor" element={<NoteEditor />} />
             <Route path="/register" element={<RegistrationForm />} />
             <Route path="/posts/:id/" element={<BlogPost />} />
             <Route path="/posts/:id/comments" element={<PostComment />} />
-            <Route path="/quilleditor" element={<NoteEditor />} />
+            <Route path="/mdeditor" element={<MarkdownEditor />} />
             <Route path="/*" element={<NotFound />} />
           </Routes>
         </Suspense>

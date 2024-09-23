@@ -25,7 +25,7 @@ const StyledFab = styled(Fab)(({ theme }) => ({
   right: theme.spacing(2),
 }));
 
-const BlogPost = styled(Card)(({ theme }) => ({
+const StyledCard = styled(Card)(({ theme }) => ({
   height: "100%",
   display: "flex",
   flexDirection: "column",
@@ -117,7 +117,7 @@ const BlogRead = () => {
           {filteredPosts &&
             filteredPosts?.map((item) => (
               <Grid item xs={12} sm={6} md={4} key={item._id}>
-                <BlogPost>
+                <StyledCard>
                   <CardMedia
                     component="img"
                     height="200"
@@ -141,7 +141,7 @@ const BlogRead = () => {
                       Read More
                     </Button>
                   </CardActions>
-                </BlogPost>
+                </StyledCard>
               </Grid>
             ))}
         </Grid>
