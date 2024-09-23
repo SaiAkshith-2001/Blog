@@ -1,9 +1,10 @@
-import { Button, Typography, Box, Container } from "@mui/material";
 import React from "react";
+import { Container, Box, Typography, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { Typewriter } from "react-simple-typewriter";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-function Home() {
+
+const Home = () => {
   const navigate = useNavigate();
   const redirectToRead = () => {
     navigate("/read");
@@ -12,61 +13,89 @@ function Home() {
     navigate("/write");
   };
   return (
-    <Container>
-      <Box>
-        <Typography
-          variant="h3"
-          sx={{
-            marginTop: "8rem",
-            textAlign: "center",
-          }}
-        >
-          Hey, Welcome to the Blog Application{" "}
-          <Typewriter
-            words={[
-              "Read.",
-              "Write.",
-              "Share.",
-              "Content.",
-              "Create.",
-              "Browse.",
-              "Explore.",
-            ]}
-            loop={0}
-            cursor
-            cursorStyle="_"
-            typeSpeed={100}
-            deleteSpeed={100}
-            delaySpeed={1000}
-          />
-        </Typography>
-      </Box>
+    <Container
+      sx={{ py: 10, display: "flex", alignItems: "center", height: "100%" }}
+    >
       <Box
         sx={{
-          display: "flex",
-          justifyContent: "center",
-          marginTop: "8rem",
-          gap: "1rem",
+          textAlign: { xs: "center", lg: "left" },
+          width: { xs: "100%", lg: "50%" },
+          mt: { lg: -8 },
         }}
       >
-        <Button
-          variant="contained"
-          size="large"
-          color="success"
-          onClick={redirectToRead}
+        <Typography
+          variant="h3"
+          component="h1"
+          sx={{ color: "text.primary", fontWeight: "bold" }}
         >
-          Get Started <ArrowForwardIcon />
-        </Button>
-        <Button
-          variant="outlined"
-          size="large"
-          color="inherit"
-          onClick={redirectToWrite}
+          Welcome to the Blog Application{" "}
+          <span
+            style={{
+              fontWeight: "600",
+              textDecoration: "underline",
+              textDecorationColor: "primary.main",
+            }}
+          >
+            <Typewriter
+              words={[
+                "Read.",
+                "Write.",
+                "Share.",
+                "Content.",
+                "Create.",
+                "Browse.",
+                "Explore.",
+              ]}
+              loop={0}
+              cursor
+              cursorStyle="_"
+              typeSpeed={100}
+              deleteSpeed={100}
+              delaySpeed={1000}
+            />
+          </span>
+        </Typography>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "left ",
+            marginTop: "8rem",
+            gap: "1rem",
+          }}
         >
-          Write
-        </Button>
+          <Button
+            variant="contained"
+            size="large"
+            color="success"
+            onClick={redirectToRead}
+          >
+            Get Started <ArrowForwardIcon />
+          </Button>
+          <Button
+            variant="outlined"
+            size="large"
+            color="inherit"
+            onClick={redirectToWrite}
+          >
+            Write
+          </Button>
+        </Box>
+      </Box>
+      <Box sx={{ width: { xs: "100%", lg: "50%" }, mt: { xs: 4, lg: 0 } }}>
+        <img
+          src="https://www.creative-tim.com/twcomponents/svg/website-designer-bro-purple.svg"
+          alt="tailwind css components"
+          style={{
+            width: "100%",
+            height: "auto",
+            maxWidth: "400px",
+            margin: "0 auto",
+            display: "block",
+          }}
+        />
       </Box>
     </Container>
   );
-}
+};
+
 export default Home;
