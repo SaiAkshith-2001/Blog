@@ -1,74 +1,74 @@
-import React, { useState, useContext } from "react";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import { AuthContext } from "../context/AuthContext";
-import * as Yup from "yup";
+import React, { useContext, useState } from "react";
 import {
+  Container,
   TextField,
   Button,
-  Container,
+  Box,
   Typography,
   Snackbar,
-  Box,
   IconButton,
   Alert,
 } from "@mui/material";
+import * as Yup from "yup";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import { AuthProvider, AuthContext } from "../context/AuthContext";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 
-const loginValidationSchema = Yup.object().shape({
+const registrationValidationSchema = Yup.object({
   username: Yup.string()
     .min(6, "Username should be of minimum 6 characters length")
     .required("Username is required"),
   password: Yup.string()
-    .min(6, "Password must be at least 6 characters")
+    .min(8, "Password should be of minimum 8 characters length")
     .required("Password is required"),
+  confirmPassword: Yup.string()
+    .oneOf([Yup.ref("password"), null], "Passwords must match")
+    .required("Confirm password is required"),
 });
 
-const Login = () => {
-  const [showPassword, setShowPassword] = useState(false);
-  const login = useContext(AuthContext);
-  const navigate = useNavigate();
+const Register = () => {
+  const { login } = useContext(AuthContext);
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
     severity: "success",
   });
+  const [showPassword, setShowPassword] = useState(false);
 
+  const navigate = useNavigate();
+  const redirectToLogin = () => {
+    navigate("/login");
+  };
   const handleShowPassword = () => {
     setShowPassword(!showPassword);
   };
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
-      const response = await axios.post("http://localhost:3500/login", {
+      const response = await axios.post("/register", {
         username: values.username,
         password: values.password,
       });
-
+      // login(response.data.token);
       console.log(response.data);
-      login(response.data.token);
       setSnackbar({
         open: true,
-        message: "Login successfully",
+        message: "User registered Successfully!",
         severity: "success",
       });
-      navigate("/write");
     } catch (error) {
-      console.error("Login failed", error);
+      console.error("Registration failed", error);
       setSnackbar({
         open: true,
-        message: "Login failed, Please verify your credentials!",
+        message: "Invalid user, Please verify your credentials!",
         severity: "error",
       });
     } finally {
       setSubmitting(false);
     }
-  };
-
-  const redirectToRegister = () => {
-    navigate("/register");
   };
 
   return (
@@ -78,36 +78,42 @@ const Login = () => {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          mt: "8rem",
+          mt: "4rem",
         }}
       >
         <Typography variant="h4" component="h1" gutterBottom>
-          Login
+          Register
         </Typography>
         <Formik
-          initialValues={{ username: "", password: "" }}
-          validationSchema={loginValidationSchema}
+          initialValues={{
+            username: "",
+            password: "",
+            confirmPassword: "",
+          }}
+          validationSchema={registrationValidationSchema}
           onSubmit={handleSubmit}
         >
           {({ isSubmitting }) => (
             <Form>
               <Field
                 as={TextField}
-                label="Username"
                 variant="outlined"
-                fullWidth
                 margin="normal"
-                name="username"
+                required
+                fullWidth
                 autoFocus
+                label="Username"
+                name="username"
                 helperText={<ErrorMessage name="username" />}
               />
               <Field
                 as={TextField}
+                variant="outlined"
+                margin="normal"
+                required
+                fullWidth
                 label="Password"
                 type={showPassword ? "text" : "password"}
-                variant="outlined"
-                fullWidth
-                margin="normal"
                 name="password"
                 helperText={<ErrorMessage name="password" />}
                 InputProps={{
@@ -122,26 +128,37 @@ const Login = () => {
                   ),
                 }}
               />
+              <Field
+                as={TextField}
+                variant="outlined"
+                margin="normal"
+                required
+                fullWidth
+                label="Confirm Password"
+                type={showPassword ? "text" : "password"}
+                name="confirmPassword"
+                helperText={<ErrorMessage name="confirmPassword" />}
+              />
               <Button
                 type="submit"
+                fullWidth
                 variant="contained"
                 color="primary"
-                fullWidth
-                gutterBottom
-                sx={{ textTransform: "none", my: "2rem" }}
+                sx={{ textTransform: "none", my: 2 }}
                 disabled={isSubmitting}
               >
-                Login
+                Register
               </Button>
-              <Button
-                variant="outlined"
-                color="primary"
-                fullWidth
-                sx={{ textTransform: "none" }}
-                onClick={redirectToRegister}
-              >
-                Create an account/Sign up
-              </Button>
+              <Typography sx={{ alignItems: "center" }}>
+                Already have an account?{" "}
+                <Button
+                  variant="text"
+                  onClick={redirectToLogin}
+                  sx={{ textTransform: "none" }}
+                >
+                  Sign In
+                </Button>
+              </Typography>
               <Snackbar
                 open={snackbar.open}
                 autoHideDuration={3000}
@@ -161,4 +178,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Register;

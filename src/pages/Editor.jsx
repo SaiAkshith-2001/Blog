@@ -92,8 +92,12 @@ const BlogPost = ({ post, onEdit, onDelete }) => (
           <Avatar sx={{ width: 24, height: 24, mr: 1 }}>
             {post.author[0]}
           </Avatar>
-          <Typography color="textSecondary" gutterBottom>
-            {post.author}
+          <Typography
+            color="textSecondary"
+            sx={{ fontStyle: "italic" }}
+            gutterBottom
+          >
+            By {post.author}
           </Typography>
         </Box>
       )}

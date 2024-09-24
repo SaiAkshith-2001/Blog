@@ -1,5 +1,5 @@
-import React, { useState, lazy, Suspense } from "react";
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import React, { useState, useContext, lazy, Suspense } from "react";
+import { BrowserRouter, Routes, Route, Link, Navigate } from "react-router-dom";
 import {
   AppBar,
   Box,
@@ -18,25 +18,34 @@ import {
   Menu,
   MenuItem,
 } from "@mui/material";
-import { AuthProvider } from "./context/AuthContext";
+import { AuthProvider, AuthContext } from "./context/AuthContext";
+import LoadingBar from "react-top-loading-bar";
+// import {
+//   LoadingBarProvider,
+//   LoadingBarContext,
+// } from "./context/LoadingBarContext";
+import ProtectedRoute from "./component/ProtectedRoute";
 const PostComment = lazy(() => import("./pages/PostComment"));
 const Home = lazy(() => import("./pages/Home"));
 const About = lazy(() => import("./pages/About"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Login = lazy(() => import("./pages/Login"));
-const RegistrationForm = lazy(() => import("./pages/RegistrationForm"));
+const Register = lazy(() => import("./pages/Register"));
 const NoteEditor = lazy(() => import("./pages/Editor"));
 const BlogRead = lazy(() => import("./pages/BlogRead"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
 const BlogWrite = lazy(() => import("./pages/BlogWrite"));
-const ThemeToggleButton = lazy(() => import("./Component/ToggleButton"));
-const MarkdownEditor = lazy(() => import("./Component/MarkdownEditor"));
+const ThemeToggleButton = lazy(() => import("./component/ToggleButton"));
+const MarkdownEditor = lazy(() => import("./component/MarkdownEditor"));
 const MenuIcon = lazy(() => import("@mui/icons-material/Menu"));
 const PersonIcon = lazy(() => import("@mui/icons-material/Person"));
 function App(props) {
   const { window } = props;
-  const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [progress, setProgress] = useState(0);
+  // const { user, role } = useContext(AuthContext);
+
   const handleDrawerToggle = () => {
     setMobileOpen((prevState) => !prevState);
   };
@@ -105,6 +114,11 @@ function App(props) {
     <BrowserRouter>
       <Box sx={{ display: "flex" }}>
         <CssBaseline />
+        <LoadingBar
+          color="#f11946"
+          progress={progress}
+          onLoaderFinished={() => setProgress(0)}
+        />
         <AppBar component="nav" position="static">
           <Toolbar>
             <IconButton
@@ -117,8 +131,14 @@ function App(props) {
               <MenuIcon />
             </IconButton>
             <Typography component="div" sx={{ flexGrow: 1 }}>
-              <Button disableRipple color="inherit" component={Link} to="/">
-                Blog
+              <Button
+                disableRipple
+                color="inherit"
+                component={Link}
+                to="/"
+                onClick={() => setProgress(100)}
+              >
+                &lt;/&gt; Blog
               </Button>
             </Typography>
             <Box
@@ -126,19 +146,44 @@ function App(props) {
                 display: { xs: "none", sm: "block" },
               }}
             >
-              <Button color="inherit" component={Link} to="/">
+              <Button
+                color="inherit"
+                component={Link}
+                to="/"
+                onClick={() => setProgress(100)}
+              >
                 Home
               </Button>
-              <Button color="inherit" component={Link} to="/write">
+              <Button
+                color="inherit"
+                component={Link}
+                to="/write"
+                onClick={() => setProgress(100)}
+              >
                 Write
               </Button>
-              <Button color="inherit" component={Link} to="/read">
+              <Button
+                color="inherit"
+                component={Link}
+                to="/read"
+                onClick={() => setProgress(100)}
+              >
                 Read
               </Button>
-              <Button color="inherit" component={Link} to="/editor">
+              <Button
+                color="inherit"
+                component={Link}
+                to="/editor"
+                onClick={() => setProgress(100)}
+              >
                 Editor
               </Button>
-              <Button color="inherit" component={Link} to="/about">
+              <Button
+                color="inherit"
+                component={Link}
+                to="/about"
+                onClick={() => setProgress(100)}
+              >
                 About
               </Button>
             </Box>
@@ -151,11 +196,19 @@ function App(props) {
               open={Boolean(anchorEl)}
               onClose={handleMenuClose}
             >
-              <MenuItem component={Link} to="/login">
+              <MenuItem
+                component={Link}
+                to="/login"
+                onClick={() => setProgress(100)}
+              >
                 Login
                 {/* if user is Logged in then show user.name else login button */}
               </MenuItem>
-              <MenuItem component={Link} to="/register">
+              <MenuItem
+                component={Link}
+                to="/register"
+                onClick={() => setProgress(100)}
+              >
                 Register
                 {/* if user is registered in then show logout button else register button */}
               </MenuItem>
@@ -198,16 +251,32 @@ function App(props) {
           }
         >
           <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/write" element={<BlogWrite />} />
+            {/* Public Routes */}
+            {/* {!user && ( */}
+            <>
+              <Route path="/" element={<Home />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/about" element={<About />} />
+            </>
+            {/* )} */}
+            {/* Guest User */}
             <Route path="/read" element={<BlogRead />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/editor" element={<NoteEditor />} />
-            <Route path="/register" element={<RegistrationForm />} />
-            <Route path="/posts/:id/" element={<BlogPost />} />
-            <Route path="/posts/:id/comments" element={<PostComment />} />
-            <Route path="/mdeditor" element={<MarkdownEditor />} />
+            {/* Protected Routes */}
+            {/* {role === "admin" && ( */}
+            <>
+              {/* <Route element={<ProtectedRoute />}> */}
+              {/* <Route path="/login" element={<Navigate to="/" />} />
+                    <Route path="/register" element={<Navigate to="/" />} /> */}
+              <Route path="/write" element={<BlogWrite />} />
+              <Route path="/editor" element={<NoteEditor />} />
+              <Route path="/posts/:id/" element={<BlogPost />} />
+              <Route path="/posts/:id/comments" element={<PostComment />} />
+              <Route path="/mdeditor" element={<MarkdownEditor />} />
+              {/* </Route> */}
+            </>
+            {/* )} */}
+            {/* handling 404 page not found */}
             <Route path="/*" element={<NotFound />} />
           </Routes>
         </Suspense>
