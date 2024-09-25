@@ -42,11 +42,10 @@ const Login = () => {
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
-      const response = await axios.post("http://localhost:3500/login", {
+      const response = await axios.post("/api/login", {
         username: values.username,
         password: values.password,
       });
-
       console.log(response.data);
       login(response.data.token);
       setSnackbar({

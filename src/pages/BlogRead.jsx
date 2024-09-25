@@ -18,7 +18,6 @@ import {
 import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
 import { Link } from "react-router-dom";
-
 const StyledFab = styled(Fab)(({ theme }) => ({
   position: "fixed",
   bottom: theme.spacing(2),

@@ -103,6 +103,8 @@ function App(props) {
 
   const container =
     window !== undefined ? () => window().document.body : undefined;
+  const open = Boolean(anchorEl);
+
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -196,18 +198,14 @@ function App(props) {
               open={Boolean(anchorEl)}
               onClose={handleMenuClose}
             >
-              <MenuItem
-                component={Link}
-                to="/login"
-                onClick={() => setProgress(100)}
-              >
+              <MenuItem component={Link} to="/login" onClick={handleMenuClose}>
                 Login
                 {/* if user is Logged in then show user.name else login button */}
               </MenuItem>
               <MenuItem
                 component={Link}
                 to="/register"
-                onClick={() => setProgress(100)}
+                onClick={handleMenuClose}
               >
                 Register
                 {/* if user is registered in then show logout button else register button */}

@@ -10,7 +10,7 @@ import {
   Alert,
 } from "@mui/material";
 import * as Yup from "yup";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import axios from "axios";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
@@ -48,12 +48,15 @@ const Register = () => {
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
-      const response = await axios.post("/register", {
+      const response = await axios.post("/api/register", {
         username: values.username,
         password: values.password,
       });
-      // login(response.data.token);
+      debugger;
+      login(response.data.token);
+      debugger;
       console.log(response.data);
+      // redirectToLogin();
       setSnackbar({
         open: true,
         message: "User registered Successfully!",
