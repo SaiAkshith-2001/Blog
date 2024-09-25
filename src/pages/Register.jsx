@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import {
   Container,
   TextField,
@@ -14,7 +14,6 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
-import { AuthContext } from "../context/AuthContext";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 
 const registrationValidationSchema = Yup.object({
@@ -30,14 +29,12 @@ const registrationValidationSchema = Yup.object({
 });
 
 const Register = () => {
-  const { login } = useContext(AuthContext);
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
     severity: "success",
   });
   const [showPassword, setShowPassword] = useState(false);
-
   const navigate = useNavigate();
   const redirectToLogin = () => {
     navigate("/login");
@@ -52,6 +49,7 @@ const Register = () => {
         username: values.username,
         password: values.password,
       });
+      //console.log(response.data)
       redirectToLogin();
       setSnackbar({
         open: true,
