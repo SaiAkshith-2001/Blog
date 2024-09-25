@@ -52,8 +52,6 @@ const Register = () => {
         username: values.username,
         password: values.password,
       });
-      login(response.data.accessToken);
-      // console.log(response.data);
       redirectToLogin();
       setSnackbar({
         open: true,
