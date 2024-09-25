@@ -16,7 +16,6 @@ import {
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { Formik, Form, Field, ErrorMessage } from "formik";
-
 const loginValidationSchema = Yup.object().shape({
   username: Yup.string()
     .min(6, "Username should be of minimum 6 characters length")
@@ -28,7 +27,7 @@ const loginValidationSchema = Yup.object().shape({
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const login = useContext(AuthContext);
+  const { login } = useContext(AuthContext);
   const navigate = useNavigate();
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -42,12 +41,13 @@ const Login = () => {
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
-      const response = await axios.post("/api/login", {
+      const response = await axios.post("http://localhost:5000/api/login", {
         username: values.username,
         password: values.password,
       });
-      console.log(response.data);
-      login(response.data.token);
+      login(response.data.accessToken);
+      // console.log(response.data.username);
+      // console.log(response.data.accessToken);
       setSnackbar({
         open: true,
         message: "Login successfully",
@@ -80,7 +80,7 @@ const Login = () => {
           mt: "8rem",
         }}
       >
-        <Typography variant="h4" component="h1" gutterBottom>
+        <Typography variant="h4" component="h1">
           Login
         </Typography>
         <Formik
@@ -126,7 +126,6 @@ const Login = () => {
                 variant="contained"
                 color="primary"
                 fullWidth
-                gutterBottom
                 sx={{ textTransform: "none", my: "2rem" }}
                 disabled={isSubmitting}
               >

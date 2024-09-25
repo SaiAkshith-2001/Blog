@@ -14,7 +14,6 @@ const AuthProvider = ({ children }) => {
       ? jwtDecode(localStorage.getItem("tokens"))
       : null
   );
-
   const login = (tokens) => {
     setAuthTokens(tokens);
     setUser(jwtDecode(tokens));

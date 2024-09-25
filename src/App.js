@@ -1,5 +1,5 @@
-import React, { useState, useContext, lazy, Suspense } from "react";
-import { BrowserRouter, Routes, Route, Link, Navigate } from "react-router-dom";
+import React, { useState, useContext, lazy } from "react";
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import {
   AppBar,
   Box,
@@ -18,12 +18,8 @@ import {
   Menu,
   MenuItem,
 } from "@mui/material";
-import { AuthProvider, AuthContext } from "./context/AuthContext";
 import LoadingBar from "react-top-loading-bar";
-// import {
-//   LoadingBarProvider,
-//   LoadingBarContext,
-// } from "./context/LoadingBarContext";
+import { AuthContext } from "./context/AuthContext";
 import ProtectedRoute from "./component/ProtectedRoute";
 const PostComment = lazy(() => import("./pages/PostComment"));
 const Home = lazy(() => import("./pages/Home"));
@@ -44,7 +40,7 @@ function App(props) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const [progress, setProgress] = useState(0);
-  // const { user, role } = useContext(AuthContext);
+  const { user, logout } = useContext(AuthContext);
 
   const handleDrawerToggle = () => {
     setMobileOpen((prevState) => !prevState);
@@ -111,6 +107,10 @@ function App(props) {
 
   const handleMenuClose = () => {
     setAnchorEl(null);
+  };
+  const handleLogout = () => {
+    setAnchorEl(null);
+    logout();
   };
   return (
     <BrowserRouter>
@@ -190,7 +190,6 @@ function App(props) {
               </Button>
             </Box>
             <IconButton color="inherit" onClick={handleMenuOpen}>
-              {/* <IconButton color="inherit" component={Link} to="/login"> */}
               <PersonIcon />
             </IconButton>
             <Menu
@@ -198,18 +197,28 @@ function App(props) {
               open={Boolean(anchorEl)}
               onClose={handleMenuClose}
             >
-              <MenuItem component={Link} to="/login" onClick={handleMenuClose}>
-                Login
-                {/* if user is Logged in then show user.name else login button */}
-              </MenuItem>
-              <MenuItem
-                component={Link}
-                to="/register"
-                onClick={handleMenuClose}
-              >
-                Register
-                {/* if user is registered in then show logout button else register button */}
-              </MenuItem>
+              {!user ? (
+                <>
+                  <MenuItem
+                    component={Link}
+                    to="/login"
+                    onClick={handleMenuClose}
+                  >
+                    Login
+                  </MenuItem>
+                  <MenuItem
+                    component={Link}
+                    to="/register"
+                    onClick={handleMenuClose}
+                  >
+                    Register
+                  </MenuItem>
+                </>
+              ) : (
+                <MenuItem component={Link} to="/" onClick={handleLogout}>
+                  Logout
+                </MenuItem>
+              )}
             </Menu>
             <ThemeToggleButton />
           </Toolbar>
@@ -233,52 +242,25 @@ function App(props) {
           {drawer}
         </Drawer>
       </Box>
-      <AuthProvider>
-        <Suspense
-          fallback={
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                position: "relative",
-              }}
-            >
-              <CircularProgress />
-            </Box>
-          }
-        >
-          <Routes>
-            {/* Public Routes */}
-            {/* {!user && ( */}
-            <>
-              <Route path="/" element={<Home />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/about" element={<About />} />
-            </>
-            {/* )} */}
-            {/* Guest User */}
-            <Route path="/read" element={<BlogRead />} />
-            {/* Protected Routes */}
-            {/* {role === "admin" && ( */}
-            <>
-              {/* <Route element={<ProtectedRoute />}> */}
-              {/* <Route path="/login" element={<Navigate to="/" />} />
-                    <Route path="/register" element={<Navigate to="/" />} /> */}
-              <Route path="/write" element={<BlogWrite />} />
-              <Route path="/editor" element={<NoteEditor />} />
-              <Route path="/posts/:id/" element={<BlogPost />} />
-              <Route path="/posts/:id/comments" element={<PostComment />} />
-              <Route path="/mdeditor" element={<MarkdownEditor />} />
-              {/* </Route> */}
-            </>
-            {/* )} */}
-            {/* handling 404 page not found */}
-            <Route path="/*" element={<NotFound />} />
-          </Routes>
-        </Suspense>
-      </AuthProvider>
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/about" element={<About />} />
+        {/* Guest User */}
+        <Route path="/read" element={<BlogRead />} />
+        {/* Protected Routes */}
+        <Route element={<ProtectedRoute />}>
+          <Route path="/write" element={<BlogWrite />} />
+          <Route path="/editor" element={<NoteEditor />} />
+          <Route path="/posts/:id/" element={<BlogPost />} />
+          <Route path="/posts/:id/comments" element={<PostComment />} />
+          <Route path="/mdeditor" element={<MarkdownEditor />} />
+        </Route>
+        {/* handling 404 page not found */}
+        <Route path="/*" element={<NotFound />} />
+      </Routes>
     </BrowserRouter>
   );
 }

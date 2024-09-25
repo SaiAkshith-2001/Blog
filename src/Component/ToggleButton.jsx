@@ -1,8 +1,8 @@
-import React, { useContext } from "react";
+import React, { useContext, lazy } from "react";
 import { ThemeContext } from "../context/ThemeContext";
 import { IconButton } from "@mui/material";
-import LightModeIcon from "@mui/icons-material/LightMode";
-import NightlightIcon from "@mui/icons-material/Nightlight";
+const LightModeIcon = lazy(() => import("@mui/icons-material/LightMode"));
+const NightlightIcon = lazy(() => import("@mui/icons-material/Nightlight"));
 const ThemeToggleButton = () => {
   const { darkMode, toggleTheme } = useContext(ThemeContext);
 

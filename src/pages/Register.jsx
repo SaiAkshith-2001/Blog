@@ -10,11 +10,11 @@ import {
   Alert,
 } from "@mui/material";
 import * as Yup from "yup";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
-import { AuthProvider, AuthContext } from "../context/AuthContext";
+import { AuthContext } from "../context/AuthContext";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 
 const registrationValidationSchema = Yup.object({
@@ -48,15 +48,13 @@ const Register = () => {
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
-      const response = await axios.post("/api/register", {
+      const response = await axios.post("http://localhost:5000/api/register", {
         username: values.username,
         password: values.password,
       });
-      debugger;
-      login(response.data.token);
-      debugger;
-      console.log(response.data);
-      // redirectToLogin();
+      login(response.data.accessToken);
+      // console.log(response.data);
+      redirectToLogin();
       setSnackbar({
         open: true,
         message: "User registered Successfully!",
@@ -84,7 +82,7 @@ const Register = () => {
           mt: "4rem",
         }}
       >
-        <Typography variant="h4" component="h1" gutterBottom>
+        <Typography variant="h4" component="h1">
           Register
         </Typography>
         <Formik
