@@ -1,4 +1,4 @@
-import React, { useState, useContext, lazy } from "react";
+import React, { useState, useContext, lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import {
   AppBar,
@@ -198,22 +198,22 @@ function App(props) {
               onClose={handleMenuClose}
             >
               {!user ? (
-                <>
+                [
                   <MenuItem
                     component={Link}
                     to="/login"
                     onClick={handleMenuClose}
                   >
                     Login
-                  </MenuItem>
+                  </MenuItem>,
                   <MenuItem
                     component={Link}
                     to="/register"
                     onClick={handleMenuClose}
                   >
                     Register
-                  </MenuItem>
-                </>
+                  </MenuItem>,
+                ]
               ) : (
                 <MenuItem component={Link} to="/" onClick={handleLogout}>
                   Logout
@@ -242,25 +242,40 @@ function App(props) {
           {drawer}
         </Drawer>
       </Box>
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/about" element={<About />} />
-        {/* Guest User */}
-        <Route path="/read" element={<BlogRead />} />
-        {/* Protected Routes */}
-        <Route element={<ProtectedRoute />}>
-          <Route path="/write" element={<BlogWrite />} />
-          <Route path="/editor" element={<NoteEditor />} />
-          <Route path="/posts/:id/" element={<BlogPost />} />
-          <Route path="/posts/:id/comments" element={<PostComment />} />
-          <Route path="/mdeditor" element={<MarkdownEditor />} />
-        </Route>
-        {/* handling 404 page not found */}
-        <Route path="/*" element={<NotFound />} />
-      </Routes>
+      <Suspense
+        fallback={
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              position: "relative",
+            }}
+          >
+            <CircularProgress />
+          </Box>
+        }
+      >
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/about" element={<About />} />
+          {/* Guest User */}
+          <Route path="/read" element={<BlogRead />} />
+          {/* Protected Routes */}
+          <Route element={<ProtectedRoute />}>
+            <Route path="/write" element={<BlogWrite />} />
+            <Route path="/editor" element={<NoteEditor />} />
+            <Route path="/posts/:id/" element={<BlogPost />} />
+            <Route path="/posts/:id/comments" element={<PostComment />} />
+            <Route path="/mdeditor" element={<MarkdownEditor />} />
+          </Route>
+          {/* handling 404 page not found */}
+          <Route path="/*" element={<NotFound />} />
+        </Routes>
+      </Suspense>
     </BrowserRouter>
   );
 }
